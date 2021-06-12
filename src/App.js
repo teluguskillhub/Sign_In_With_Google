@@ -1,25 +1,52 @@
-import logo from './logo.svg';
-import './App.css';
+import firebase from 'firebase';
+import {useState,useEffect} from 'react';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+firebase.initializeApp({
+  apiKey: "",
+    authDomain: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: ""
+})
+const auth = firebase.auth();
+
+const App = () => {
+  const [user,setUser] = useState(null);
+useEffect(()=>{
+  auth.onAuthStateChanged(person=> {
+    if(person){
+      setUser(person)
+    }
+    else{
+      setUser(null)
+    }
+  })
+})
+const signInWithGoogle = async () =>{
+  try{
+    await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  }
+  catch(err){
+    console.log(err);
+  }
 }
 
-export default App;
+  return (
+    <div>
+        <center>
+          {user?
+          <div>
+           <h1>Welcome to home page </h1>
+          <button onClick={()=>auth.signOut()}>Sign Out</button>
+          </div>
+          :
+          <button onClick={signInWithGoogle}>Sign In With Google</button>}
+          
+        </center>
+    </div>
+  )
+}
+
+export default App
+
